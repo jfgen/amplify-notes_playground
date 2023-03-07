@@ -8,6 +8,7 @@ import config from "./aws-exports";
 import { AmplifyProvider } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { AuthModeStrategyType } from "aws-amplify";
+import { studioTheme } from "./ui-components";
 
 Amplify.configure({
   ...config,
@@ -18,7 +19,7 @@ Amplify.configure({
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <AmplifyProvider>
+  <AmplifyProvider theme={studioTheme}>
     <App />
   </AmplifyProvider>,
 );
