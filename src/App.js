@@ -6,11 +6,23 @@ import {
   NoteUICollection,
   UpdateNote,
 } from "./ui-components";
+import { withAuthenticator } from "@aws-amplify/ui-react";
+import { DataStore } from "aws-amplify";
+import { Hub } from "aws-amplify";
 
-function App() {
+function App({ signOut }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updateNote, setUpdateNote] = useState();
+
+  Hub.listen("ui", (capsule) => {
+    if (capsule.payload.event === "actions:datastore:create:finished") {
+      setShowCreateModal(false);
+    }
+    if (capsule.payload.event === "actions:datastore:update:finished") {
+      setShowUpdateModal(false);
+    }
+  });
 
   return (
     <>
@@ -19,6 +31,12 @@ function App() {
         marginBottom="20px"
         overrides={{
           Button31632483: { onClick: () => setShowCreateModal(true) },
+          Button31632487: {
+            onClick: async () => {
+              await DataStore.clear();
+              signOut();
+            },
+          },
         }}
       />
       <div className="container">
@@ -28,8 +46,8 @@ function App() {
               overrides: {
                 EditButton: {
                   onClick: () => {
-                    setShowUpdateModal(true);
                     setUpdateNote(item);
+                    setShowUpdateModal(true);
                   },
                 },
               },
@@ -59,7 +77,10 @@ function App() {
           overrides={{
             MyIcon: {
               as: "button",
-              onClick: () => setShowUpdateModal(false),
+              onClick: () => {
+                setShowUpdateModal(false);
+                setUpdateNote();
+              },
             },
           }}
         />
@@ -68,4 +89,4 @@ function App() {
   );
 }
 
-export default App;
+export default withAuthenticator(App);
